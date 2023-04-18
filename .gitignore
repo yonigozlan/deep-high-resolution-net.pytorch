@@ -85,8 +85,10 @@ lib/pycocotools/_mask.c
 lib/nms/cpu_nms.c
 
 output/*
+output_infinity_coco/*
 models/*
 log/*
+log_infinity_coco/*
 data/*
 external/
 
