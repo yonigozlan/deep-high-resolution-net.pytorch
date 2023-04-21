@@ -39,7 +39,6 @@ def save_batch_image_with_joints(
                 break
             joints = batch_joints[k]
             joints_vis = batch_joints_vis[k]
-
             i_joint = 0
             for joint, joint_vis in zip(joints, joints_vis):
                 joint[0] = x * width + padding + joint[0]

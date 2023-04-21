@@ -12,6 +12,7 @@ from collections import OrderedDict, defaultdict
 
 import json_tricks as json
 import numpy as np
+from dataset.coco import COCODataset
 from dataset.JointsDataset import JointsDataset
 from nms.nms import oks_nms, soft_oks_nms
 from pycocotools.coco import COCO
@@ -61,6 +62,9 @@ class InfinityCocoDataset(JointsDataset):
         self.pixel_std = 200
 
         self.coco = COCO(self._get_ann_file_keypoint())
+        self.coco_dataset = COCODataset(
+            cfg, root, image_set, is_train, transform, infinity=True
+        )
 
         # deal with class names
         cats = [cat["id"] for cat in self.coco.loadCats(self.coco.getCatIds())]
@@ -238,11 +242,14 @@ class InfinityCocoDataset(JointsDataset):
     def _load_coco_keypoint_annotations(self):
         """ground truth bbox and keypoints"""
         gt_db = []
-        for index in self.image_set_index:
-            gt_db.extend(self._load_coco_keypoint_annotation_kernal(index))
+        for index, index_coco in zip(
+            self.image_set_index,
+            self.coco_dataset.image_set_index[: len(self.image_set_index)],
+        ):
+            gt_db.extend(self._load_coco_keypoint_annotation_kernal(index, index_coco))
         return gt_db
 
-    def _load_coco_keypoint_annotation_kernal(self, index):
+    def _load_coco_keypoint_annotation_kernal(self, index, index_coco):
         """
         coco ann: [u'segmentation', u'area', u'iscrowd', u'image_id', u'bbox', u'category_id', u'id']
         iscrowd:
@@ -320,6 +327,26 @@ class InfinityCocoDataset(JointsDataset):
                     "imgnum": 0,
                 }
             )
+
+        rec_coco = self.coco_dataset._load_coco_keypoint_annotation_kernal(index_coco)
+        for r in rec_coco:
+            joints_3d_coco = r["joints_3d"]
+            joints_3d_vis_coco = r["joints_3d_vis"]
+            joints_3d_coco = np.vstack(
+                (
+                    joints_3d_coco,
+                    np.zeros((self.num_joints_infinity, 3), dtype=np.float32),
+                )
+            )
+            joints_3d_vis_coco = np.vstack(
+                (
+                    joints_3d_vis_coco,
+                    np.zeros((self.num_joints_infinity, 3), dtype=np.float32),
+                )
+            )
+            r["joints_3d"] = joints_3d_coco
+            r["joints_3d_vis"] = joints_3d_vis_coco
+            rec.append(r)
 
         return rec
 
