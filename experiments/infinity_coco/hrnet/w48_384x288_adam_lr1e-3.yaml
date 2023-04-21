@@ -17,7 +17,7 @@ DATASET:
   FLIP: true
   NUM_JOINTS_HALF_BODY: 27
   PROB_HALF_BODY: 0.3
-  ROOT: "../infinity_dataset_medium_512"
+  ROOT: "../infinity_dataset_combined"
   ROT_FACTOR: 45
   SCALE_FACTOR: 0.35
   TEST_SET: "test"
@@ -91,7 +91,7 @@ MODEL:
 LOSS:
   USE_TARGET_WEIGHT: true
 TRAIN:
-  BATCH_SIZE_PER_GPU: 2
+  BATCH_SIZE_PER_GPU: 20
   SHUFFLE: true
   BEGIN_EPOCH: 0
   END_EPOCH: 200
