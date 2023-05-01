@@ -182,6 +182,7 @@ CocoColors = [
 
 NUM_KPTS = 17
 NUM_KPTS_INFINITY = 41
+NUM_KPTS_INFINITY_COCO = NUM_KPTS + NUM_KPTS_INFINITY
 
 CTX = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 
@@ -209,7 +210,21 @@ def draw_pose_infinity(keypoints, img):
     assert keypoints.shape == (NUM_KPTS_INFINITY, 2)
     for i in range(len(keypoints)):
         x, y = keypoints[i][0], keypoints[i][1]
-        cv2.circle(img, (int(x), int(y)), 2, CocoColors[i % len(CocoColors)], -1)
+        cv2.circle(img, (int(x), int(y)), 2, [255, 0, 0], -1)
+
+
+def draw_pose_infinity_coco(keypoints, img):
+    """draw the keypoints and the skeletons.
+    :params keypoints: the shape should be equal to [17,2]
+    :params img:
+    """
+    assert keypoints.shape == (NUM_KPTS_INFINITY_COCO, 2)
+    for i in range(len(keypoints)):
+        x, y = keypoints[i][0], keypoints[i][1]
+        if i < NUM_KPTS:
+            cv2.circle(img, (int(x), int(y)), 2, [0, 0, 255], -1)
+        else:
+            cv2.circle(img, (int(x), int(y)), 2, [255, 0, 0], -1)
 
 
 def draw_bbox(box, img):
@@ -505,7 +520,9 @@ def main():
                 )
                 if len(pose_preds) >= 1:
                     for kpt in pose_preds:
-                        if len(kpt) == 41:
+                        if len(kpt) == 58:
+                            draw_pose_infinity_coco(kpt, image_bgr)
+                        elif len(kpt) == 41:
                             draw_pose_infinity(kpt, image_bgr)
                         else:
                             draw_pose(kpt, image_bgr)
