@@ -460,7 +460,9 @@ def main():
                         )
                         if len(pose_preds) >= 1:
                             for kpt in pose_preds:
-                                if len(kpt) == 41:
+                                if len(kpt) == 58:
+                                    draw_pose_infinity_coco(kpt, image_bgr)
+                                elif len(kpt) == 41:
                                     draw_pose_infinity(kpt, image_bgr)
                                 else:
                                     draw_pose(kpt, image_bgr)  # draw the poses
