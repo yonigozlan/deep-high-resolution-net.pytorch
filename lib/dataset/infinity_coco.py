@@ -58,6 +58,7 @@ class InfinityCocoDataset(JointsDataset):
         self.use_gt_bbox = cfg.TEST.USE_GT_BBOX
         self.image_width = cfg.MODEL.IMAGE_SIZE[0]
         self.image_height = cfg.MODEL.IMAGE_SIZE[1]
+        self.coco_infinity_ratio = 10
         self.aspect_ratio = self.image_width * 1.0 / self.image_height
         self.pixel_std = 200
 
@@ -242,14 +243,24 @@ class InfinityCocoDataset(JointsDataset):
     def _load_coco_keypoint_annotations(self):
         """ground truth bbox and keypoints"""
         gt_db = []
-        for index, index_coco in zip(
+        indices_coco = []
+        iter_coco = iter(self.coco_dataset.image_set_index)
+        batch_indices_coco = [
+            [next(iter_coco) for _ in range(self.coco_infinity_ratio)]
+            for _ in range(len(self.image_set_index))
+        ]
+        for index, indices_coco in zip(
             self.image_set_index,
-            self.coco_dataset.image_set_index[: len(self.image_set_index)],
+            batch_indices_coco,
         ):
-            gt_db.extend(self._load_coco_keypoint_annotation_kernal(index, index_coco))
+            gt_db.extend(
+                self._load_coco_keypoint_annotation_kernal(index, indices_coco)
+            )
         return gt_db
 
-    def _load_coco_keypoint_annotation_kernal(self, index, index_coco):
+    def _load_coco_keypoint_annotation_kernal(
+        self, index: int, indices_coco: list[int]
+    ):
         """
         coco ann: [u'segmentation', u'area', u'iscrowd', u'image_id', u'bbox', u'category_id', u'id']
         iscrowd:
@@ -326,26 +337,26 @@ class InfinityCocoDataset(JointsDataset):
                     "imgnum": 0,
                 }
             )
-
-        rec_coco = self.coco_dataset._load_coco_keypoint_annotation_kernal(index_coco)
-        for r in rec_coco:
-            joints_3d_coco = r["joints_3d"]
-            joints_3d_vis_coco = r["joints_3d_vis"]
-            joints_3d_coco = np.vstack(
-                (
-                    joints_3d_coco,
-                    np.zeros((self.num_joints_infinity, 3), dtype=np.float32),
+        for index_coco in indices_coco:
+            rec_coco = self.coco_dataset._load_coco_keypoint_annotation_kernal(index_coco)
+            for r in rec_coco:
+                joints_3d_coco = r["joints_3d"]
+                joints_3d_vis_coco = r["joints_3d_vis"]
+                joints_3d_coco = np.vstack(
+                    (
+                        joints_3d_coco,
+                        np.zeros((self.num_joints_infinity, 3), dtype=np.float32),
+                    )
                 )
-            )
-            joints_3d_vis_coco = np.vstack(
-                (
-                    joints_3d_vis_coco,
-                    np.zeros((self.num_joints_infinity, 3), dtype=np.float32),
+                joints_3d_vis_coco = np.vstack(
+                    (
+                        joints_3d_vis_coco,
+                        np.zeros((self.num_joints_infinity, 3), dtype=np.float32),
+                    )
                 )
-            )
-            r["joints_3d"] = joints_3d_coco
-            r["joints_3d_vis"] = joints_3d_vis_coco
-            rec.append(r)
+                r["joints_3d"] = joints_3d_coco
+                r["joints_3d_vis"] = joints_3d_vis_coco
+                rec.append(r)
 
         return rec
 
