@@ -314,7 +314,6 @@ class InfinityCocoDataset(JointsDataset):
                 joints_3d_vis[self.num_joints_coco + ipt, 0] = t_vis
                 joints_3d_vis[self.num_joints_coco + ipt, 1] = t_vis
                 joints_3d_vis[self.num_joints_coco + ipt, 2] = 0
-
             center, scale = self._box2cs(obj["clean_bbox"][:4])
             rec.append(
                 {

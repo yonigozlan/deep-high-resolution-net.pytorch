@@ -49,8 +49,8 @@ class COCODataset(JointsDataset):
     def __init__(self, cfg, root, image_set, is_train, transform=None, infinity=False):
         super().__init__(cfg, root, image_set, is_train, transform)
         if infinity:
-            self.root = "data/coco/"
-            self.image_set = "val2017"
+            self.root = "$SCRATCH/coco_dataset/"
+            self.image_set = "train2017"
 
         self.nms_thre = cfg.TEST.NMS_THRE
         self.image_thre = cfg.TEST.IMAGE_THRE
