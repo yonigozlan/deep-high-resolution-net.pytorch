@@ -5,8 +5,8 @@ CUDNN:
   ENABLED: true
 DATA_DIR: ""
 GPUS: (0,)
-OUTPUT_DIR: "outputs/output_infinity_coco_unfrozen"
-LOG_DIR: "logs/log_infinity_coco_unfrozen"
+OUTPUT_DIR: "outputs/output_infinity_coco_local"
+LOG_DIR: "logs/log_infinity_coco_local"
 WORKERS: 2
 PRINT_FREQ: 10
 
@@ -18,13 +18,13 @@ DATASET:
   NUM_JOINTS_HALF_BODY: 27
   PROB_HALF_BODY: 0.3
   ROOT: "../infinity_dataset_combined"
-  ROOT_COCO: "/scratch/users/yonigoz/coco_dataset/"
+  ROOT_COCO: "data/coco/"
   ROT_FACTOR: 45
   SCALE_FACTOR: 0.35
   TEST_SET: "test"
   TRAIN_SET: "train"
-  TRAIN_SET_COCO: "train2017"
-  COCO_INFINITY_RATIO: 10
+  TRAIN_SET_COCO: "val2017"
+  COCO_INFINITY_RATIO: 1
 MODEL:
   INIT_WEIGHTS: true
   NAME: pose_hrnet
@@ -63,7 +63,6 @@ MODEL:
       - "stage3"
       - "transition3"
       - "stage4"
-    PRETRAIN_FINAL_LAYER: true
     FINAL_CONV_KERNEL: 1
     STAGE2:
       NUM_MODULES: 1
@@ -107,12 +106,12 @@ MODEL:
 LOSS:
   USE_TARGET_WEIGHT: true
 TRAIN:
-  BATCH_SIZE_PER_GPU: 32
+  BATCH_SIZE_PER_GPU: 2
   SHUFFLE: true
   BEGIN_EPOCH: 0
   END_EPOCH: 200
   OPTIMIZER: adam
-  LR: 0.001
+  LR: 0.00001
   LR_FACTOR: 0.1
   LR_STEP:
     - 170
@@ -123,7 +122,7 @@ TRAIN:
   MOMENTUM: 0.9
   NESTEROV: false
 TEST:
-  BATCH_SIZE_PER_GPU: 32
+  BATCH_SIZE_PER_GPU: 10
   COCO_BBOX_FILE: "data/coco/person_detection_results/COCO_val2017_detections_AP_H_56_person.json"
   BBOX_THRE: 1.0
   IMAGE_THRE: 0.0

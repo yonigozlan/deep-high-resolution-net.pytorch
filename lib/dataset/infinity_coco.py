@@ -58,7 +58,7 @@ class InfinityCocoDataset(JointsDataset):
         self.use_gt_bbox = cfg.TEST.USE_GT_BBOX
         self.image_width = cfg.MODEL.IMAGE_SIZE[0]
         self.image_height = cfg.MODEL.IMAGE_SIZE[1]
-        self.coco_infinity_ratio = 10
+        self.coco_infinity_ratio = cfg.DATASET.COCO_INFINITY_RATIO
         self.aspect_ratio = self.image_width * 1.0 / self.image_height
         self.pixel_std = 200
 
@@ -338,7 +338,9 @@ class InfinityCocoDataset(JointsDataset):
                 }
             )
         for index_coco in indices_coco:
-            rec_coco = self.coco_dataset._load_coco_keypoint_annotation_kernal(index_coco)
+            rec_coco = self.coco_dataset._load_coco_keypoint_annotation_kernal(
+                index_coco
+            )
             for r in rec_coco:
                 joints_3d_coco = r["joints_3d"]
                 joints_3d_vis_coco = r["joints_3d_vis"]
