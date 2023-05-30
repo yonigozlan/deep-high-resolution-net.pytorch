@@ -131,6 +131,7 @@ def validate(
     model.eval()
 
     num_samples = len(val_dataset)
+    # all_preds = np.zeros((num_samples, 17, 3), dtype=np.float32)
     all_preds = np.zeros((num_samples, config.MODEL.NUM_JOINTS, 3), dtype=np.float32)
     all_boxes = np.zeros((num_samples, 6))
     image_path = []
@@ -142,6 +143,7 @@ def validate(
         for i, (input, target, target_weight, meta) in enumerate(val_loader):
             # compute output
             outputs = model(input)
+            # outputs = model(input)[:, :17, :, :]
             if isinstance(outputs, list):
                 output = outputs[-1]
             else:
@@ -149,6 +151,7 @@ def validate(
 
             if config.TEST.FLIP_TEST:
                 input_flipped = input.flip(3)
+                # outputs_flipped = model(input_flipped)[:, :17, :, :]
                 outputs_flipped = model(input_flipped)
 
                 if isinstance(outputs_flipped, list):

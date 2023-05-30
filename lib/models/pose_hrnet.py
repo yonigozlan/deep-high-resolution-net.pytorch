@@ -343,7 +343,10 @@ class PoseHighResolutionNet(nn.Module):
         )
 
         self.pretrained_layers = extra["PRETRAINED_LAYERS"]
-        self.pretrain_final_layer = extra["PRETRAIN_FINAL_LAYER"]
+        if "PRETRAIN_FINAL_LAYER" in extra:
+            self.pretrain_final_layer = extra["PRETRAIN_FINAL_LAYER"]
+        else:
+            self.pretrain_final_layer = False
 
     def _make_transition_layer(self, num_channels_pre_layer, num_channels_cur_layer):
         num_branches_cur = len(num_channels_cur_layer)
@@ -511,6 +514,7 @@ class PoseHighResolutionNet(nn.Module):
             self.load_state_dict(need_init_state_dict, strict=False)
 
             if self.pretrain_final_layer:
+                print("load final layer")
                 self.final_layer.weight.data[:17, :, :, :] = pretrained_state_dict[
                     "final_layer.weight"
                 ]

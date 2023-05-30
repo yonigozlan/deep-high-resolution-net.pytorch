@@ -5,9 +5,9 @@ CUDNN:
   ENABLED: true
 DATA_DIR: ""
 GPUS: (0,)
-OUTPUT_DIR: "outputs/output_infinity_coco_local"
-LOG_DIR: "logs/log_infinity_coco_local"
-WORKERS: 2
+OUTPUT_DIR: "outputs/output_new_infinity"
+LOG_DIR: "logs/output_new_infinity"
+WORKERS: 12
 PRINT_FREQ: 10
 
 DATASET:
@@ -17,7 +17,7 @@ DATASET:
   FLIP: true
   NUM_JOINTS_HALF_BODY: 27
   PROB_HALF_BODY: 0.3
-  ROOT: "../infinity_dataset_combined"
+  ROOT: "../combined_infinity_dataset"
   ROOT_COCO: "data/coco/"
   ROT_FACTOR: 45
   SCALE_FACTOR: 0.35
@@ -63,6 +63,7 @@ MODEL:
       - "stage3"
       - "transition3"
       - "stage4"
+    PRETRAIN_FINAL_LAYER: true
     FINAL_CONV_KERNEL: 1
     STAGE2:
       NUM_MODULES: 1

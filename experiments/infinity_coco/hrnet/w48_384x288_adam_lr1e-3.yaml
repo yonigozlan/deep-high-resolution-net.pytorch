@@ -5,9 +5,9 @@ CUDNN:
   ENABLED: true
 DATA_DIR: ""
 GPUS: (0,)
-OUTPUT_DIR: "outputs/output_infinity_coco_unfrozen"
-LOG_DIR: "logs/log_infinity_coco_unfrozen"
-WORKERS: 2
+OUTPUT_DIR: "outputs/output_new_infinity"
+LOG_DIR: "logs/output_new_infinity"
+WORKERS: 12
 PRINT_FREQ: 10
 
 DATASET:
@@ -17,14 +17,14 @@ DATASET:
   FLIP: true
   NUM_JOINTS_HALF_BODY: 27
   PROB_HALF_BODY: 0.3
-  ROOT: "../infinity_dataset_combined"
+  ROOT: "../combined_infinity_dataset"
   ROOT_COCO: "/scratch/users/yonigoz/coco_dataset/"
   ROT_FACTOR: 45
   SCALE_FACTOR: 0.35
   TEST_SET: "test"
   TRAIN_SET: "train"
   TRAIN_SET_COCO: "train2017"
-  COCO_INFINITY_RATIO: 10
+  COCO_INFINITY_RATIO: 3
 MODEL:
   INIT_WEIGHTS: true
   NAME: pose_hrnet
