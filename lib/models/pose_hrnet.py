@@ -333,7 +333,7 @@ class PoseHighResolutionNet(nn.Module):
         self.stage4, pre_stage_channels = self._make_stage(
             self.stage4_cfg, num_channels, multi_scale_output=False
         )
-
+        print("in channels final layer: ", pre_stage_channels[0])
         self.final_layer = nn.Conv2d(
             in_channels=pre_stage_channels[0],
             out_channels=cfg["MODEL"]["NUM_JOINTS"],
@@ -532,5 +532,6 @@ def get_pose_net(cfg, is_train, **kwargs):
 
     if is_train and cfg["MODEL"]["INIT_WEIGHTS"]:
         model.init_weights(cfg["MODEL"]["PRETRAINED"])
+        print("finishing loading pretrained weights")
 
     return model
