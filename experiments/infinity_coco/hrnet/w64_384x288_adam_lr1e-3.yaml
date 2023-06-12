@@ -7,7 +7,7 @@ DATA_DIR: ""
 GPUS: (0,)
 OUTPUT_DIR: "outputs/output_new_infinity_64"
 LOG_DIR: "logs/output_new_infinity_64"
-WORKERS: 12
+WORKERS: 0
 PRINT_FREQ: 10
 LOG_WANDB: True
 
@@ -108,7 +108,7 @@ MODEL:
 LOSS:
   USE_TARGET_WEIGHT: true
 TRAIN:
-  BATCH_SIZE_PER_GPU: 4
+  BATCH_SIZE_PER_GPU: 8
   SHUFFLE: true
   BEGIN_EPOCH: 0
   END_EPOCH: 200
@@ -124,7 +124,7 @@ TRAIN:
   MOMENTUM: 0.9
   NESTEROV: false
 TEST:
-  BATCH_SIZE_PER_GPU: 4
+  BATCH_SIZE_PER_GPU: 8
   COCO_BBOX_FILE: "data/coco/person_detection_results/COCO_val2017_detections_AP_H_56_person.json"
   BBOX_THRE: 1.0
   IMAGE_THRE: 0.0
