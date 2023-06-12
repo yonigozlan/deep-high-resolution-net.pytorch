@@ -9,6 +9,7 @@ OUTPUT_DIR: "outputs/output_new_infinity"
 LOG_DIR: "logs/output_new_infinity"
 WORKERS: 12
 PRINT_FREQ: 10
+LOG_WANDB: True
 
 DATASET:
   COLOR_RGB: true

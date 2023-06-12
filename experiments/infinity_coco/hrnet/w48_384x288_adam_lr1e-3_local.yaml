@@ -9,6 +9,7 @@ OUTPUT_DIR: "outputs/output_new_infinity"
 LOG_DIR: "logs/output_new_infinity"
 WORKERS: 12
 PRINT_FREQ: 10
+LOG_WANDB: True
 
 DATASET:
   COLOR_RGB: true
@@ -57,13 +58,13 @@ MODEL:
       - "conv2"
       - "bn2"
       - "layer1"
-      # - "transition1"
-      # - "stage2"
-      # - "transition2"
-      # - "stage3"
-      # - "transition3"
-      # - "stage4"
-    PRETRAIN_FINAL_LAYER: false
+      - "transition1"
+      - "stage2"
+      - "transition2"
+      - "stage3"
+      - "transition3"
+      - "stage4"
+    PRETRAIN_FINAL_LAYER: true
     FINAL_CONV_KERNEL: 1
     STAGE2:
       NUM_MODULES: 1
@@ -73,8 +74,8 @@ MODEL:
         - 4
         - 4
       NUM_CHANNELS:
-        - 64
-        - 128
+        - 48
+        - 96
       FUSE_METHOD: SUM
     STAGE3:
       NUM_MODULES: 4
@@ -85,9 +86,9 @@ MODEL:
         - 4
         - 4
       NUM_CHANNELS:
-        - 64
-        - 128
-        - 256
+        - 48
+        - 96
+        - 192
       FUSE_METHOD: SUM
     STAGE4:
       NUM_MODULES: 3
@@ -99,20 +100,20 @@ MODEL:
         - 4
         - 4
       NUM_CHANNELS:
-        - 64
-        - 128
-        - 256
-        - 512
+        - 48
+        - 96
+        - 192
+        - 384
       FUSE_METHOD: SUM
 LOSS:
   USE_TARGET_WEIGHT: true
 TRAIN:
-  BATCH_SIZE_PER_GPU: 1
+  BATCH_SIZE_PER_GPU: 2
   SHUFFLE: true
   BEGIN_EPOCH: 0
   END_EPOCH: 200
   OPTIMIZER: adam
-  LR: 0.00001
+  LR: 0.001
   LR_FACTOR: 0.1
   LR_STEP:
     - 170
@@ -123,7 +124,7 @@ TRAIN:
   MOMENTUM: 0.9
   NESTEROV: false
 TEST:
-  BATCH_SIZE_PER_GPU: 1
+  BATCH_SIZE_PER_GPU: 2
   COCO_BBOX_FILE: "data/coco/person_detection_results/COCO_val2017_detections_AP_H_56_person.json"
   BBOX_THRE: 1.0
   IMAGE_THRE: 0.0

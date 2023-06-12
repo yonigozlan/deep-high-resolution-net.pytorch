@@ -12,6 +12,7 @@ import time
 
 import numpy as np
 import torch
+import wandb
 from core.evaluate import accuracy
 from core.inference import get_final_preds
 from utils.transforms import flip_back
@@ -102,6 +103,15 @@ def train(
                 )
             )
             logger.info(msg)
+            if config.LOG_WANDB:
+                wandb.log(
+                    {
+                        "epoch": epoch,
+                        "loss_avg": losses.avg,
+                        "accuracy_avg": acc.avg,
+                        "speed": input.size(0) / batch_time.val,
+                    }
+                )
 
             writer = writer_dict["writer"]
             global_steps = writer_dict["train_global_steps"]

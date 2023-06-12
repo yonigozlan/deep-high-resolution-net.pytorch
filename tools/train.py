@@ -20,6 +20,7 @@ import torch.optim
 import torch.utils.data
 import torch.utils.data.distributed
 import torchvision.transforms as transforms
+import wandb
 from config import cfg, update_config
 from core.function import train, validate
 from core.loss import JointsMSELoss
@@ -66,6 +67,8 @@ def main():
 
     logger.info(pprint.pformat(args))
     logger.info(cfg)
+    if cfg.LOG_WANDB:
+        wandb.init(project="synthetic_finetuning", entity="yonigoz", config=cfg)
 
     # cudnn related setting
     cudnn.benchmark = cfg.CUDNN.BENCHMARK
