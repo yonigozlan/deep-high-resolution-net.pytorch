@@ -13,7 +13,7 @@ import time
 import numpy as np
 import torch
 import wandb
-from core.evaluate import accuracy
+from core.evaluate import accuracy, accuracy_infinity_coco
 from core.inference import get_final_preds
 from utils.transforms import flip_back
 from utils.vis import save_debug_images
@@ -35,7 +35,11 @@ def train(
     batch_time = AverageMeter()
     data_time = AverageMeter()
     losses = AverageMeter()
-    acc = AverageMeter()
+    if config.MODEL.NUM_JOINTS == 58:
+        acc_infinity = AverageMeter()
+        acc_coco = AverageMeter()
+    else:
+        acc = AverageMeter()
 
     # switch to train mode
     model.train()
@@ -75,48 +79,99 @@ def train(
         # measure accuracy and record loss
         losses.update(loss.item(), input.size(0))
 
-        _, avg_acc, cnt, pred = accuracy(
-            output.detach().cpu().numpy(), target.detach().cpu().numpy()
-        )
-        acc.update(avg_acc, cnt)
+        if config.MODEL.NUM_JOINTS == 58:
+            (
+                (_, avg_acc_infinity, cnt_infinity),
+                (
+                    _,
+                    avg_acc_coco,
+                    cnt_coco,
+                ),
+                pred,
+            ) = accuracy_infinity_coco(
+                output.detach().cpu().numpy(), target.detach().cpu().numpy()
+            )
+            acc_infinity.update(avg_acc_infinity, cnt_infinity)
+            acc_coco.update(avg_acc_coco, cnt_coco)
+        else:
+            _, avg_acc, cnt, pred = accuracy(
+                output.detach().cpu().numpy(), target.detach().cpu().numpy()
+            )
+            acc.update(avg_acc, cnt)
 
         # measure elapsed time
         batch_time.update(time.time() - end)
         end = time.time()
 
         if i % config.PRINT_FREQ == 0:
-            msg = (
-                "Epoch: [{0}][{1}/{2}]\t"
-                "Time {batch_time.val:.3f}s ({batch_time.avg:.3f}s)\t"
-                "Speed {speed:.1f} samples/s\t"
-                "Data {data_time.val:.3f}s ({data_time.avg:.3f}s)\t"
-                "Loss {loss.val:.5f} ({loss.avg:.5f})\t"
-                "Accuracy {acc.val:.3f} ({acc.avg:.3f})".format(
-                    epoch,
-                    i,
-                    len(train_loader),
-                    batch_time=batch_time,
-                    speed=input.size(0) / batch_time.val,
-                    data_time=data_time,
-                    loss=losses,
-                    acc=acc,
+            if config.MODEL.NUM_JOINTS == 58:
+                msg = (
+                    "Epoch: [{0}][{1}/{2}]\t"
+                    "Time {batch_time.val:.3f}s ({batch_time.avg:.3f}s)\t"
+                    "Speed {speed:.1f} samples/s\t"
+                    "Data {data_time.val:.3f}s ({data_time.avg:.3f}s)\t"
+                    "Loss {loss.val:.5f} ({loss.avg:.5f})\t"
+                    "Accuracy Infinity {acc_infinity.val:.3f} ({acc_infinity.avg:.3f})\t"
+                    "Accuracy COCO {acc_coco.val:.3f} ({acc_coco.avg:.3f})".format(
+                        epoch,
+                        i,
+                        len(train_loader),
+                        batch_time=batch_time,
+                        speed=input.size(0) / batch_time.val,
+                        data_time=data_time,
+                        loss=losses,
+                        acc_infinity=acc_infinity,
+                        acc_coco=acc_coco,
+                    )
                 )
-            )
+            else:
+                msg = (
+                    "Epoch: [{0}][{1}/{2}]\t"
+                    "Time {batch_time.val:.3f}s ({batch_time.avg:.3f}s)\t"
+                    "Speed {speed:.1f} samples/s\t"
+                    "Data {data_time.val:.3f}s ({data_time.avg:.3f}s)\t"
+                    "Loss {loss.val:.5f} ({loss.avg:.5f})\t"
+                    "Accuracy {acc.val:.3f} ({acc.avg:.3f})".format(
+                        epoch,
+                        i,
+                        len(train_loader),
+                        batch_time=batch_time,
+                        speed=input.size(0) / batch_time.val,
+                        data_time=data_time,
+                        loss=losses,
+                        acc=acc,
+                    )
+                )
             logger.info(msg)
             if config.LOG_WANDB:
-                wandb.log(
-                    {
-                        "epoch": epoch,
-                        "loss_avg": losses.avg,
-                        "accuracy_avg": acc.avg,
-                        "speed": input.size(0) / batch_time.val,
-                    }
-                )
+                if config.MODEL.NUM_JOINTS == 58:
+                    wandb.log(
+                        {
+                            "epoch": epoch,
+                            "train/loss_avg": losses.avg,
+                            "train/accuracy_infinity_avg": acc_infinity.avg,
+                            "train/accuracy_coco_avg": acc_coco.avg,
+                            "speed": input.size(0) / batch_time.val,
+                        }
+                    )
+                else:
+                    wandb.log(
+                        {
+                            "epoch": epoch,
+                            "train/loss_avg": losses.avg,
+                            "train/accuracy_avg": acc.avg,
+                            "speed": input.size(0) / batch_time.val,
+                        }
+                    )
 
             writer = writer_dict["writer"]
             global_steps = writer_dict["train_global_steps"]
             writer.add_scalar("train_loss", losses.val, global_steps)
-            writer.add_scalar("train_acc", acc.val, global_steps)
+            if config.MODEL.NUM_JOINTS == 58:
+                writer.add_scalar("train_acc_infinity", acc_infinity.val, global_steps)
+                writer.add_scalar("train_acc_coco", acc_coco.val, global_steps)
+            else:
+                writer.add_scalar("train_acc", acc.val, global_steps)
             writer_dict["train_global_steps"] = global_steps + 1
 
             prefix = "{}_{}".format(os.path.join(output_dir, "train"), i)
@@ -249,6 +304,14 @@ def validate(
             else:
                 writer.add_scalars("valid", dict(name_values), global_steps)
             writer_dict["valid_global_steps"] = global_steps + 1
+
+        if config.LOG_WANDB:
+            wandb.log(
+                {
+                    "val/loss_avg": losses.avg,
+                    "val/accuracy_avg": acc.avg,
+                }
+            )
 
     return perf_indicator
 
