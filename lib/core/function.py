@@ -37,6 +37,7 @@ def train(
     losses = AverageMeter()
     if config.MODEL.NUM_JOINTS == 58:
         acc_infinity = AverageMeter()
+        acc_anatomical = AverageMeter()
         acc_coco = AverageMeter()
     else:
         acc = AverageMeter()
@@ -82,16 +83,14 @@ def train(
         if config.MODEL.NUM_JOINTS == 58:
             (
                 (_, avg_acc_infinity, cnt_infinity),
-                (
-                    _,
-                    avg_acc_coco,
-                    cnt_coco,
-                ),
+                (_, avg_acc_anatomical, cnt_anatomical),
+                (_, avg_acc_coco, cnt_coco),
                 pred,
             ) = accuracy_infinity_coco(
                 output.detach().cpu().numpy(), target.detach().cpu().numpy()
             )
             acc_infinity.update(avg_acc_infinity, cnt_infinity)
+            acc_anatomical.update(avg_acc_anatomical, cnt_anatomical)
             acc_coco.update(avg_acc_coco, cnt_coco)
         else:
             _, avg_acc, cnt, pred = accuracy(
@@ -112,6 +111,7 @@ def train(
                     "Data {data_time.val:.3f}s ({data_time.avg:.3f}s)\t"
                     "Loss {loss.val:.5f} ({loss.avg:.5f})\t"
                     "Accuracy Infinity {acc_infinity.val:.3f} ({acc_infinity.avg:.3f})\t"
+                    "Accuracy Anatomical {acc_anatomical.val:.3f} ({acc_anatomical.avg:.3f})\t"
                     "Accuracy COCO {acc_coco.val:.3f} ({acc_coco.avg:.3f})".format(
                         epoch,
                         i,
@@ -121,6 +121,7 @@ def train(
                         data_time=data_time,
                         loss=losses,
                         acc_infinity=acc_infinity,
+                        acc_anatomical=acc_anatomical,
                         acc_coco=acc_coco,
                     )
                 )
@@ -150,6 +151,7 @@ def train(
                             "epoch": epoch,
                             "train/loss_avg": losses.avg,
                             "train/accuracy_infinity_avg": acc_infinity.avg,
+                            "train/accuracy_anatomical_avg": acc_anatomical.avg,
                             "train/accuracy_coco_avg": acc_coco.avg,
                             "speed": input.size(0) / batch_time.val,
                         }
@@ -169,6 +171,9 @@ def train(
             writer.add_scalar("train_loss", losses.val, global_steps)
             if config.MODEL.NUM_JOINTS == 58:
                 writer.add_scalar("train_acc_infinity", acc_infinity.val, global_steps)
+                writer.add_scalar(
+                    "train_acc_anatomical", acc_anatomical.val, global_steps
+                )
                 writer.add_scalar("train_acc_coco", acc_coco.val, global_steps)
             else:
                 writer.add_scalar("train_acc", acc.val, global_steps)
@@ -192,6 +197,7 @@ def validate(
     losses = AverageMeter()
     if config.MODEL.NUM_JOINTS == 58:
         acc_infinity = AverageMeter()
+        acc_anatomical = AverageMeter()
         acc_coco = AverageMeter()
     else:
         acc = AverageMeter()
@@ -250,14 +256,12 @@ def validate(
             if config.MODEL.NUM_JOINTS == 58:
                 (
                     (_, avg_acc_infinity, cnt_infinity),
-                    (
-                        _,
-                        avg_acc_coco,
-                        cnt_coco,
-                    ),
+                    (_, avg_acc_anatomical, cnt_anatomical),
+                    (_, avg_acc_coco, cnt_coco),
                     pred,
                 ) = accuracy_infinity_coco(output.cpu().numpy(), target.cpu().numpy())
                 acc_infinity.update(avg_acc_infinity, cnt_infinity)
+                acc_anatomical.update(avg_acc_anatomical, cnt_anatomical)
                 acc_coco.update(avg_acc_coco, cnt_coco)
             else:
                 _, avg_acc, cnt, pred = accuracy(
@@ -293,12 +297,14 @@ def validate(
                         "Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t"
                         "Loss {loss.val:.4f} ({loss.avg:.4f})\t"
                         "Accuracy Infinity {acc_infinity.val:.3f} ({acc_infinity.avg:.3f})\t"
+                        "Accuracy Anatomical {acc_anatomical.val:.3f} ({acc_anatomical.avg:.3f})\t"
                         "Accuracy COCO {acc_coco.val:.3f} ({acc_coco.avg:.3f})".format(
                             i,
                             len(val_loader),
                             batch_time=batch_time,
                             loss=losses,
                             acc_infinity=acc_infinity,
+                            acc_anatomical=acc_anatomical,
                             acc_coco=acc_coco,
                         )
                     )
@@ -337,6 +343,9 @@ def validate(
             writer.add_scalar("valid_loss", losses.avg, global_steps)
             if config.MODEL.NUM_JOINTS == 58:
                 writer.add_scalar("valid_acc_infinity", acc_infinity.avg, global_steps)
+                writer.add_scalar(
+                    "valid_acc_anatomical", acc_anatomical.avg, global_steps
+                )
                 writer.add_scalar("valid_acc_coco", acc_coco.avg, global_steps)
             else:
                 writer.add_scalar("valid_acc", acc.avg, global_steps)
@@ -353,6 +362,7 @@ def validate(
                     {
                         "val/loss_avg": losses.avg,
                         "val/accuracy_infinity_avg": acc_infinity.avg,
+                        "val/accuracy_anatomical_avg": acc_anatomical.avg,
                         "val/accuracy_coco_avg": acc_coco.avg,
                     }
                 )

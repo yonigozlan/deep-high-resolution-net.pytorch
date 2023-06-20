@@ -102,25 +102,30 @@ def accuracy_infinity_coco(output, target, hm_type="gaussian", thr=0.5):
         w = output.shape[3]
         norm = np.ones((pred.shape[0], 2)) * np.array([h, w]) / 10
     pred_infinity = pred.copy()[infinity_idxs]
+    pred_anatomical = pred.copy()[infinity_idxs][:, 17:, :]
     pred_coco = pred.copy()[~infinity_idxs][:, :17, :]
+
     norm_infinity = norm.copy()[infinity_idxs]
-    norm_coco = norm.copy()[~infinity_idxs]
+    norm_anatomical = norm.copy()[infinity_idxs][:, 17:, :]
+    norm_coco = norm.copy()[~infinity_idxs][:, :17, :]
+
     target_infinity = target.copy()[infinity_idxs]
     target_coco = target.copy()[~infinity_idxs][:, :17, :]
-    # print("target_coco", target_coco)
-    # print("target_infinity", target_infinity)
+    target_anatomical = target.copy()[infinity_idxs][:, 17:, :]
+
     dists_infinity = calc_dists(pred_infinity, target_infinity, norm_infinity)
     dists_coco = calc_dists(pred_coco, target_coco, norm_coco)
+    dists_anatomical = calc_dists(pred_anatomical, target_anatomical, norm_anatomical)
 
     acc_infinity, avg_acc_infinity, cnt_infinity = get_acc(idx, dists_infinity)
     acc_coco, avg_acc_coco, cnt_coco = get_acc(list(range(17)), dists_coco)
+    acc_anatomical, avg_acc_anatomical, cnt_anatomical = get_acc(
+        list(range(output.shape[1] - 17)), dists_anatomical
+    )
 
     return (
         (acc_infinity, avg_acc_infinity, cnt_infinity),
-        (
-            acc_coco,
-            avg_acc_coco,
-            cnt_coco,
-        ),
+        (acc_anatomical, avg_acc_anatomical, cnt_anatomical),
+        (acc_coco, avg_acc_coco, cnt_coco),
         pred,
     )
