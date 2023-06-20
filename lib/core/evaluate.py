@@ -106,12 +106,12 @@ def accuracy_infinity_coco(output, target, hm_type="gaussian", thr=0.5):
     pred_coco = pred.copy()[~infinity_idxs][:, :17, :]
 
     norm_infinity = norm.copy()[infinity_idxs]
-    norm_anatomical = norm.copy()[infinity_idxs][17:, :]
-    norm_coco = norm.copy()[~infinity_idxs][:17, :]
+    norm_anatomical = norm.copy()[infinity_idxs]
+    norm_coco = norm.copy()[~infinity_idxs]
 
     target_infinity = target.copy()[infinity_idxs]
-    target_coco = target.copy()[~infinity_idxs][:, :17, :]
     target_anatomical = target.copy()[infinity_idxs][:, 17:, :]
+    target_coco = target.copy()[~infinity_idxs][:, :17, :]
 
     dists_infinity = calc_dists(pred_infinity, target_infinity, norm_infinity)
     dists_coco = calc_dists(pred_coco, target_coco, norm_coco)
