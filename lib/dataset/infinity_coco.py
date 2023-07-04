@@ -87,7 +87,7 @@ class InfinityCocoDataset(JointsDataset):
         self.num_images = len(self.image_set_index)
         logger.info("=> num_images: {}".format(self.num_images))
 
-        self.num_joints_infinity = 41
+        self.num_joints_infinity = 36
         self.num_joints_coco = 17
         self.num_joints = self.num_joints_infinity + self.num_joints_coco
 
@@ -107,9 +107,7 @@ class InfinityCocoDataset(JointsDataset):
             [26, 27],
             [28, 29],
             [30, 31],
-            [32, 33],
             [34, 35],
-            [39, 40],
         ]
         self.flip_pairs_coco = [
             [1, 2],
@@ -121,7 +119,7 @@ class InfinityCocoDataset(JointsDataset):
             [13, 14],
             [15, 16],
         ]
-        self.flip_pairs__infinity = [
+        self.flip_pairs_infinity = [
             [x + self.num_joints_coco, y + self.num_joints_coco]
             for x, y in self.flip_pairs_infinity
         ]
@@ -145,12 +143,7 @@ class InfinityCocoDataset(JointsDataset):
             29,
             30,
             31,
-            32,
             33,
-            34,
-            35,
-            36,
-            38,
         )
         self.lower_body_ids_infinity = (
             12,
@@ -169,9 +162,9 @@ class InfinityCocoDataset(JointsDataset):
             25,
             26,
             27,
-            37,
-            39,
-            40,
+            32,
+            34,
+            35,
         )
 
         self.upper_body_ids_coco = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)

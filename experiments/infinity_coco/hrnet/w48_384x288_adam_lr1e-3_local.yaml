@@ -18,7 +18,7 @@ DATASET:
   FLIP: true
   NUM_JOINTS_HALF_BODY: 27
   PROB_HALF_BODY: 0.3
-  ROOT: "../combined_dataset"
+  ROOT: "../new_infinity_dataset_2"
   ROOT_COCO: "data/coco/"
   ROT_FACTOR: 45
   SCALE_FACTOR: 0.35
@@ -29,7 +29,7 @@ DATASET:
 MODEL:
   INIT_WEIGHTS: true
   NAME: pose_hrnet
-  NUM_JOINTS: 58
+  NUM_JOINTS: 53
   PRETRAINED: "models/pytorch/pose_coco/pose_hrnet_w48_384x288.pth"
   TARGET_TYPE: gaussian
   IMAGE_SIZE:

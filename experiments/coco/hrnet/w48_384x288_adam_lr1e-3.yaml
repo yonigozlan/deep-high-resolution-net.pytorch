@@ -25,7 +25,7 @@ DATASET:
 MODEL:
   INIT_WEIGHTS: true
   NAME: pose_hrnet
-  NUM_JOINTS: 58
+  NUM_JOINTS: 53
   # NUM_JOINTS: 17
   PRETRAINED: "models/pytorch/imagenet/hrnet_w48-8ef0771d.pth"
   TARGET_TYPE: gaussian
@@ -113,7 +113,7 @@ TEST:
   BBOX_THRE: 1.0
   IMAGE_THRE: 0.0
   IN_VIS_THRE: 0.2
-  MODEL_FILE: "outputs/sherlock/model_best1e-3_62_epochs.pth"
+  MODEL_FILE: "outputs/sherlock/model_best-20h-48.pth"
   # MODEL_FILE: "models/pytorch/pose_coco/pose_hrnet_w48_384x288.pth"
   NMS_THRE: 1.0
   OKS_THRE: 0.9

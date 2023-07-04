@@ -181,7 +181,7 @@ CocoColors = [
 ]
 
 NUM_KPTS = 17
-NUM_KPTS_INFINITY = 41
+NUM_KPTS_INFINITY = 36
 NUM_KPTS_INFINITY_COCO = NUM_KPTS + NUM_KPTS_INFINITY
 
 CTX = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
@@ -460,9 +460,9 @@ def main():
                         )
                         if len(pose_preds) >= 1:
                             for kpt in pose_preds:
-                                if len(kpt) == 58:
+                                if len(kpt) == 53:
                                     draw_pose_infinity_coco(kpt, image_bgr)
-                                elif len(kpt) == 41:
+                                elif len(kpt) == 36:
                                     draw_pose_infinity(kpt, image_bgr)
                                 else:
                                     draw_pose(kpt, image_bgr)  # draw the poses
@@ -522,9 +522,9 @@ def main():
                 )
                 if len(pose_preds) >= 1:
                     for kpt in pose_preds:
-                        if len(kpt) == 58:
+                        if len(kpt) == 53:
                             draw_pose_infinity_coco(kpt, image_bgr)
-                        elif len(kpt) == 41:
+                        elif len(kpt) == 36:
                             draw_pose_infinity(kpt, image_bgr)
                         else:
                             draw_pose(kpt, image_bgr)

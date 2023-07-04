@@ -82,7 +82,7 @@ class InfinityDataset(JointsDataset):
         self.num_images = len(self.image_set_index)
         logger.info("=> num_images: {}".format(self.num_images))
 
-        self.num_joints = 41
+        self.num_joints = 36
         self.flip_pairs = [
             [1, 2],
             [3, 4],

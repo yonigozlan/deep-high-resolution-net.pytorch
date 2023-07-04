@@ -35,7 +35,7 @@ def train(
     batch_time = AverageMeter()
     data_time = AverageMeter()
     losses = AverageMeter()
-    if config.MODEL.NUM_JOINTS == 58:
+    if config.MODEL.NUM_JOINTS == 53:
         acc_infinity = AverageMeter()
         acc_anatomical = AverageMeter()
         acc_coco = AverageMeter()
@@ -80,7 +80,7 @@ def train(
         # measure accuracy and record loss
         losses.update(loss.item(), input.size(0))
 
-        if config.MODEL.NUM_JOINTS == 58:
+        if config.MODEL.NUM_JOINTS == 53:
             (
                 (_, avg_acc_infinity, cnt_infinity),
                 (_, avg_acc_anatomical, cnt_anatomical),
@@ -103,7 +103,7 @@ def train(
         end = time.time()
 
         if i % config.PRINT_FREQ == 0:
-            if config.MODEL.NUM_JOINTS == 58:
+            if config.MODEL.NUM_JOINTS == 53:
                 msg = (
                     "Epoch: [{0}][{1}/{2}]\t"
                     "Time {batch_time.val:.3f}s ({batch_time.avg:.3f}s)\t"
@@ -145,7 +145,7 @@ def train(
                 )
             logger.info(msg)
             if config.LOG_WANDB:
-                if config.MODEL.NUM_JOINTS == 58:
+                if config.MODEL.NUM_JOINTS == 53:
                     wandb.log(
                         {
                             "epoch": epoch,
@@ -169,7 +169,7 @@ def train(
             writer = writer_dict["writer"]
             global_steps = writer_dict["train_global_steps"]
             writer.add_scalar("train_loss", losses.val, global_steps)
-            if config.MODEL.NUM_JOINTS == 58:
+            if config.MODEL.NUM_JOINTS == 53:
                 writer.add_scalar("train_acc_infinity", acc_infinity.val, global_steps)
                 writer.add_scalar(
                     "train_acc_anatomical", acc_anatomical.val, global_steps
@@ -195,7 +195,7 @@ def validate(
 ):
     batch_time = AverageMeter()
     losses = AverageMeter()
-    if config.MODEL.NUM_JOINTS == 58:
+    if config.MODEL.NUM_JOINTS == 53:
         acc_infinity = AverageMeter()
         acc_anatomical = AverageMeter()
         acc_coco = AverageMeter()
@@ -206,8 +206,8 @@ def validate(
     model.eval()
 
     num_samples = len(val_dataset)
-    # all_preds = np.zeros((num_samples, 17, 3), dtype=np.float32)
-    all_preds = np.zeros((num_samples, config.MODEL.NUM_JOINTS, 3), dtype=np.float32)
+    all_preds = np.zeros((num_samples, 17, 3), dtype=np.float32)
+    # all_preds = np.zeros((num_samples, config.MODEL.NUM_JOINTS, 3), dtype=np.float32)
     all_boxes = np.zeros((num_samples, 6))
     image_path = []
     filenames = []
@@ -217,8 +217,8 @@ def validate(
         end = time.time()
         for i, (input, target, target_weight, meta) in enumerate(val_loader):
             # compute output
-            outputs = model(input)
-            # outputs = model(input)[:, :17, :, :]
+            # outputs = model(input)
+            outputs = model(input)[:, :17, :, :]
             if isinstance(outputs, list):
                 output = outputs[-1]
             else:
@@ -226,8 +226,8 @@ def validate(
 
             if config.TEST.FLIP_TEST:
                 input_flipped = input.flip(3)
-                # outputs_flipped = model(input_flipped)[:, :17, :, :]
-                outputs_flipped = model(input_flipped)
+                outputs_flipped = model(input_flipped)[:, :17, :, :]
+                # outputs_flipped = model(input_flipped)
 
                 if isinstance(outputs_flipped, list):
                     output_flipped = outputs_flipped[-1]
@@ -253,7 +253,7 @@ def validate(
             num_images = input.size(0)
             # measure accuracy and record loss
             losses.update(loss.item(), num_images)
-            if config.MODEL.NUM_JOINTS == 58:
+            if config.MODEL.NUM_JOINTS == 53:
                 (
                     (_, avg_acc_infinity, cnt_infinity),
                     (_, avg_acc_anatomical, cnt_anatomical),
@@ -291,7 +291,7 @@ def validate(
             idx += num_images
 
             if i % config.PRINT_FREQ == 0:
-                if config.MODEL.NUM_JOINTS == 58:
+                if config.MODEL.NUM_JOINTS == 53:
                     msg = (
                         "Test: [{0}/{1}]\t"
                         "Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t"
@@ -341,7 +341,7 @@ def validate(
             writer = writer_dict["writer"]
             global_steps = writer_dict["valid_global_steps"]
             writer.add_scalar("valid_loss", losses.avg, global_steps)
-            if config.MODEL.NUM_JOINTS == 58:
+            if config.MODEL.NUM_JOINTS == 53:
                 writer.add_scalar("valid_acc_infinity", acc_infinity.avg, global_steps)
                 writer.add_scalar(
                     "valid_acc_anatomical", acc_anatomical.avg, global_steps
@@ -357,7 +357,7 @@ def validate(
             writer_dict["valid_global_steps"] = global_steps + 1
 
         if config.LOG_WANDB:
-            if config.MODEL.NUM_JOINTS == 58:
+            if config.MODEL.NUM_JOINTS == 53:
                 wandb.log(
                     {
                         "val/loss_avg": losses.avg,
